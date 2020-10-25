@@ -4,13 +4,13 @@
 
 import sys
 sys.path.insert(0, '../../Utilities/')
-
+import os
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import scipy.io
-from plotting import newfig, savefig
+#from plotting import newfig, savefig
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -44,11 +44,16 @@ class PhysicsInformedNN:
         self.lambda_2 = tf.Variable([-6.0], dtype=tf.float32)       
         
         # Load IRK weights
-        tmp = np.float32(np.loadtxt('../../Utilities/IRK_weights/Butcher_IRK%d.txt' % (q), ndmin = 2))
+        path=os.path.realpath(os.curdir)
+        path=os.path.join(path,"Utilities/IRK_weights/Butcher_IRK%d.txt"% (q))
+        tmp = np.float32(np.loadtxt(path, ndmin = 2))
         weights =  np.reshape(tmp[0:q**2+q], (q+1,q))     
         self.IRK_alpha = weights[0:-1,:]
         self.IRK_beta = weights[-1:,:]        
         self.IRK_times = tmp[q**2+q:]
+        print("!!!!!!!!!!!!!",self.IRK_alpha)
+        print("!!!!!!!!!!!!!",self.IRK_beta)
+        print("!!!!!!!!!!!!!",self.IRK_times)
         
         # tf placeholders and graph
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True,
@@ -185,13 +190,13 @@ if __name__ == "__main__":
     N0 = 199
     N1 = 201
     layers = [1, 50, 50, 50, 50, q]
+    path=os.path.realpath(os.curdir)
+    path=os.path.join(path,"main/Data/KdV.mat")
+    data = scipy.io.loadmat(path)
     
-    data = scipy.io.loadmat('../Data/KdV.mat')
-    
-    t_star = data['tt'].flatten()[:,None]
-    x_star = data['x'].flatten()[:,None]
-    Exact = np.real(data['uu'])
-    
+    t_star = data['tt'].flatten()[:,None]       #(201,1)
+    x_star = data['x'].flatten()[:,None]        #(512,1)
+    Exact = np.real(data['uu'])                 #(512,201)
     idx_t = 40
         
     ######################################################################
@@ -210,13 +215,13 @@ if __name__ == "__main__":
     u1 = u1 + noise*np.std(u1)*np.random.randn(u1.shape[0], u1.shape[1])
     
     dt = np.asscalar(t_star[idx_t+skip] - t_star[idx_t])        
-        
+    print("!!!!!!!!!!!!",dt)    
     # Doman bounds
     lb = x_star.min(0)
     ub = x_star.max(0)
 
     model = PhysicsInformedNN(x0, u0, x1, u1, layers, dt, lb, ub, q)
-    model.train(nIter = 50000)
+    model.train(nIter = 1000)
     
     U0_pred, U1_pred = model.predict(x_star)    
         
@@ -257,7 +262,7 @@ if __name__ == "__main__":
     ######################################################################
     ############################# Plotting ###############################
     ######################################################################
-    
+    '''
     fig, ax = newfig(1.0, 1.5)
     ax.axis('off')
     
@@ -309,5 +314,5 @@ if __name__ == "__main__":
     s5 = r'\end{tabular}$'
     s = s1+s2+s3+s4+s5
     ax.text(-0.1,0.2,s)
-
+    '''
     # savefig('./figures/KdV') 
