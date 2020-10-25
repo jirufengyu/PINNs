@@ -14,13 +14,17 @@ import time
 from itertools import product, combinations
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from plotting import newfig, savefig
+#from plotting import newfig, savefig
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
 
 np.random.seed(1234)
 tf.set_random_seed(1234)
-
+x=np.random.randint(-10,10,size=100)
+y=tf.sigmoid(tf.cast(x,tf.float32))
+with tf.Session() as sess:
+    y=y.eval()
+print("!!!!!!!!!!!!!",y)
 class PhysicsInformedNN:
     # Initialize the class
     def __init__(self, x, y, t, u, v, layers):
@@ -330,6 +334,7 @@ if __name__ == "__main__":
     ############################# Plotting ###############################
     ######################################################################    
      # Load Data
+    '''
     data_vort = scipy.io.loadmat('../Data/cylinder_nektar_t0_vorticity.mat')
            
     x_vort = data_vort['x'] 
@@ -489,4 +494,4 @@ if __name__ == "__main__":
     ax.text(0.015,0.0,s)
     
     # savefig('./figures/NavierStokes_prediction') 
-
+    '''
