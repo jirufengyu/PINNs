@@ -1,11 +1,20 @@
+'''
+Author: jirufengyu
+Date: 2020-11-09 05:30:42
+LastEditTime: 2020-11-09 05:38:56
+LastEditors: jirufengyu
+Description: Nothing
+FilePath: /PINNs/fgwas/simu.py
+'''
 from math import exp
 import numpy as np
+
 def get_mean_vector(pheY, pheT):
-	t_count = length(np.unique(pheT))
-	if(t_count>=20):
-		t_min = min(pheT)
+	t_count = len(np.unique(pheT))
+	if t_count>=20 :
+        t_min = min(pheT)
 		t_max = max(pheT)
-		pheT = round((pheT - t_min)/(t_max-t_min)*20)/20*(t_max-t_min) + t_min
+        pheT = round((pheT - t_min)/(t_max-t_min)*20)/20*(t_max-t_min) + t_min  
     t=np.unique(pheT)
 	t_all = t.sort(reverse=False)
 	y_all = []
@@ -16,13 +25,13 @@ def get_mean_vector(pheY, pheT):
 f=[1,2,3,4,5,6]
 y=[2,4,6,8,10,12]
 print(get_mean_vector(y,f))
-class Curve:
 ##-----------------------------------------------------------
 ## Logistic curve
 ##
 ##    y = a/(1+b*exp(-r*t))
 ##
 ##-----------------------------------------------------------
+class Curve:
     def log_get_curve(self,par,times):
         y=par[1]/(1+par[2]*exp(-1*par[3]*times))
         return y
@@ -33,7 +42,7 @@ class Curve:
         return list(d_a,d_b,d_r)
     def log_get_simu_param(object, times, options=list()):
         return np.asarray([[18.18,9.98,0.99],[17.08,9.78,0.97],[15.95,9.88,0.98]])
-    '''
+'''
     def log_est_init_param(object, pheY, pheX, pheT, options=list()):
 
         mc = get_mean_vector(pheY, pheT)
@@ -68,4 +77,5 @@ class Curve:
             
         
 
-        return (par*runif(length(par),0.95, 1.05) )'''
+        return (par*runif(length(par),0.95, 1.05) )
+'''
