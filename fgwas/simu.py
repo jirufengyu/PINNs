@@ -1,7 +1,7 @@
 '''
 Author: jirufengyu
 Date: 2020-11-09 05:30:42
-LastEditTime: 2020-11-09 16:27:43
+LastEditTime: 2020-11-09 16:34:47
 LastEditors: jirufengyu
 Description: Nothing
 FilePath: /PINNs/fgwas/simu.py
@@ -50,15 +50,15 @@ class Curve:
         d_b=(-1)*par[1]/((1+par[2]*exp(-1 * par[3]*times))^2)*exp(-1*par[3]*times)
         d_r=(-1)*par[1]/((1+par[2]*exp(-1 * par[3]*times))^2)*par[2]*exp(-1*par[3]*times)*(-1*times)
         return list(d_a,d_b,d_r)
-    def log_get_simu_param(self, times, options=list()):
+    def log_get_simu_param(self, times, ):
         return np.asarray([[18.18,9.98,0.99],[17.08,9.78,0.97],[15.95,9.88,0.98]])
 
-    def log_est_init_param(self, pheY, pheX, pheT, options=list()):
+    def log_est_init_param(self, pheY,  pheT):
 
         mc = get_mean_vector(pheY, pheT)        #[t,y]
         mc_t = mc["t"][np.where(mc["y"]>0)]
         mc_y = mc["y"][np.where(mc["y"]>0)]
-        m = len(mc_t)
+        m = len(mc_t)-1
         if(m==0):
             mc = get_mean_vector(pheY, pheT)
             mc_y = mc["y"] - min(mc["y"])*1.01
@@ -78,8 +78,8 @@ class Curve:
                 continue;
 
             par_b = (par_a / mc_y[m] -1)/exp(-par_r*mc_t[m])
-
-            y_ls = sum(abs(mc_y - par_a/(1+par_b*exp(-par_r*mc_t)))^2)
+            
+            y_ls = sum(abs(mc_y - par_a/(1+par_b*exp(-par_r*mc_t)))**2)
 
             if (y_ls < ls_max):
             
@@ -91,4 +91,7 @@ class Curve:
         rand=0.1*np.random.random(len(par))+0.95
         result=list(map(lambda x,y:x*y,par,rand))                  #两列表相乘
         return result
-
+t=np.linspace(11,30,20,dtype=np.int)
+y=np.linspace(1,20,20,dtype=np.int)
+c=Curve()
+print(c.log_est_init_param(y,t))
