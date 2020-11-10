@@ -1,7 +1,7 @@
 '''
 Author: jirufengyu
 Date: 2020-11-09 05:30:42
-LastEditTime: 2020-11-09 16:34:47
+LastEditTime: 2020-11-10 16:06:06
 LastEditors: jirufengyu
 Description: Nothing
 FilePath: /PINNs/fgwas/simu.py
@@ -24,8 +24,6 @@ def get_mean_vector(pheT,pheY):
     if t_count>=20:
         t_min=min(pheT)
         t_max=max(pheT)
-        print(t_min)
-        print(t_max)
         pheT=np.round((pheT-t_min)/(t_max-t_min)*20)/20*(t_max-t_min)+t_min
     t=np.unique(pheT)
     t_all=np.sort(t)
@@ -55,7 +53,7 @@ class Curve:
 
     def log_est_init_param(self, pheY,  pheT):
 
-        mc = get_mean_vector(pheY, pheT)        #[t,y]
+        mc = get_mean_vector(pheT, pheY)        #[t,y]
         mc_t = mc["t"][np.where(mc["y"]>0)]
         mc_y = mc["y"][np.where(mc["y"]>0)]
         m = len(mc_t)-1
@@ -65,33 +63,37 @@ class Curve:
 
         par = []
         ls_i = ls_max = float("inf")
-        a_rate = np.mean(mc_y[-1]/mc_y[-m])
+        minx=np.delete(mc_y,[0])
+        maxx=np.delete(mc_y,[m])
+        a_rate = np.mean(minx/maxx)
         if(a_rate==1) :
             a_rate = 0.99
-        for i in range(1,10):
-        
+        for i in range(1,11):
             par_a = mc_y[m] * a_rate**i
-            #par_r = try( (log(par.a/mc.y[1]-1) - log(par.a/mc.y[m]-1))/(mc.t[1]-mc.t[m]))
+
             try:
-                par_r=(np.log(par_a/mc_y[1]-1) - np.log(par_a/mc_y[m]-1))/(mc_t[1]-mc_t[m])
+                par_r=(np.log(par_a/mc_y[0]-1) - np.log(par_a/mc_y[m]-1))/(mc_t[0]-mc_t[m])
             except:
                 continue;
-
             par_b = (par_a / mc_y[m] -1)/exp(-par_r*mc_t[m])
+            #print(type((1+par_b*np.exp(-par_r*mc_t))))
             
-            y_ls = sum(abs(mc_y - par_a/(1+par_b*exp(-par_r*mc_t)))**2)
-
+            y_ls = np.sum(np.abs(mc_y - par_a/(1+par_b*np.exp(-par_r*mc_t)))**2)
+            
             if (y_ls < ls_max):
             
                 ls_i = i
                 ls_max = y_ls
                 par = [par_a, par_b, par_r]
             
-        
+        #print(par)
         rand=0.1*np.random.random(len(par))+0.95
+        
         result=list(map(lambda x,y:x*y,par,rand))                  #两列表相乘
+        #print(result)
         return result
-t=np.linspace(11,30,20,dtype=np.int)
 y=np.linspace(1,20,20,dtype=np.int)
+t=np.linspace(11,30,20,dtype=np.int)
+
 c=Curve()
 print(c.log_est_init_param(y,t))
