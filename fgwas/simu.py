@@ -1,13 +1,17 @@
 '''
 Author: jirufengyu
 Date: 2020-11-09 05:30:42
-LastEditTime: 2020-11-10 16:06:06
+LastEditTime: 2020-11-14 02:29:58
 LastEditors: jirufengyu
 Description: Nothing
 FilePath: /PINNs/fgwas/simu.py
 '''
 from math import exp
 import numpy as np
+def runif(num,minx=0,maxx=1):
+    #产生num个从min到max的随机float型随机数,类型为ndarray
+    rand=(maxx-minx)*np.random.random(num)+minx
+    return rand
 def get_mean_vector(pheT,pheY):
     """
     input:
@@ -50,7 +54,6 @@ class Curve:
         return list(d_a,d_b,d_r)
     def log_get_simu_param(self, times, ):
         return np.asarray([[18.18,9.98,0.99],[17.08,9.78,0.97],[15.95,9.88,0.98]])
-
     def log_est_init_param(self, pheY,  pheT):
 
         mc = get_mean_vector(pheT, pheY)        #[t,y]
@@ -86,9 +89,7 @@ class Curve:
                 ls_max = y_ls
                 par = [par_a, par_b, par_r]
             
-        #print(par)
-        rand=0.1*np.random.random(len(par))+0.95
-        
+        rand=runif(len(par),0.95,1.05)
         result=list(map(lambda x,y:x*y,par,rand))                  #两列表相乘
         #print(result)
         return result
@@ -97,3 +98,28 @@ t=np.linspace(11,30,20,dtype=np.int)
 
 c=Curve()
 print(c.log_est_init_param(y,t))
+
+def fin_generate_bc_marker( n_obs, dist ):
+
+    if (dist[1] != 0):
+        cm=c(0, dist)/100
+    else:
+        cm=dist/100
+  
+    n  = len(cm)
+    rs = 1/2*( np.exp(2*cm) - np.exp(-2*cm) ) / (np.exp(2*cm)+np.exp(-2*cm))
+    mk = array( 0, dim=c( n_obs, n ) )
+  
+    for j in 1:n_obs:
+        mk[j,1] = ( runif(1)>0_5 )
+  
+    for i in 2:n:
+        for  j in 1:n_obs :
+        
+            if (mk[j,i-1]==1)
+                mk[j,i] = ( runif(1)>rs[i] )
+            else
+                mk[j,i] = ( runif(1)<rs[i] )
+        
+  
+    return mk
